@@ -280,3 +280,125 @@ Since T2 is the blocker, we have TWO paths:
 ---
 
 *"We don't give up. We do what others don't and build what isn't possible." — RavenX LLC*
+
+---
+
+## T2 Disable Strategy (June 4, 2026)
+
+### THE KEY INSIGHT
+
+t2linux project ALREADY boots Linux on T2 Macs using ONLY:
+1. Startup Security Utility → "No Security"
+2. Allow External Boot
+3. Custom kernel with apple-bce driver
+
+They DON'T need checkm8! But macOS Tahoe fails because Apple's kernel
+EXPECTS a T2 handshake that times out when booting via OpenCore →
+AppleKeyStore.kext causes kernel panic.
+
+### THREE-LEVEL APPROACH
+
+**Level 1: Soft Disable (try FIRST — no exploit needed)**
+```
+1. Boot into Recovery (Cmd+R)
+2. Utilities → Startup Security Utility
+3. Set "No Security" (disables Intel-side secure boot)
+4. Check "Allow booting from external media"
+5. Boot macOS Tahoe from external Thunderbolt 3 SSD via OpenCore
+6. Block AppleKeyStore.kext in OpenCore Kernel→Block section
+7. Apply OCLP-Plus patches for Vega Metal + Wi-Fi + Audio
+```
+
+**Level 2: checkra1n T2 Jailbreak (if Level 1 fails)**
+```
+1. Put T2 in DFU mode (power + specific key combo)
+2. Run checkra1n via USB-C to exploit checkm8 vulnerability
+3. pongoOS loads → disable T2 secure boot
+4. Boot macOS Tahoe normally
+5. Semi-tethered: needs re-exploit on each cold boot
+```
+
+**Level 3: Permanent T2 Disable Tool (THE COMMUNITY CONTRIBUTION)**
+```
+1. Use checkra1n + pongoOS to access T2 firmware
+2. Write custom pongoOS module that:
+   a. Patches T2 secure boot verification routine
+   b. Disables AppleKeyStore timeout enforcement
+   c. Allows unsigned bootloaders permanently
+   d. Preserves T2 hardware functions (NVMe, audio, keyboard)
+3. Tool persists across reboots — no re-exploit needed
+4. One-time USB-C setup → permanent T2 freedom
+```
+
+### WHY THIS IS POSSIBLE
+
+The T2 chip has an UNPATCHABLE vulnerability (checkm8):
+- Based on A10 processor (iPhone 7)
+- ROM-level exploit — Apple cannot fix via software update
+- checkra1n already exploits this for iPhone jailbreaking
+- pongoOS already runs custom code on T2
+- The toolchain EXISTS — we just need to write the persistence layer
+
+### WHAT WE'D BUILD: `t2-freedom`
+
+```
+t2-freedom — Permanent T2 Secure Boot Disable for macOS Tahoe
+
+Usage:
+  1. Connect USB-C cable between iMac Pro and another Mac/PC
+  2. Put iMac Pro T2 in DFU mode
+  3. Run: t2-freedom --disable-secure-boot
+  4. T2 secure boot permanently disabled
+  5. Boot macOS Tahoe via OpenCore normally
+
+What it does:
+  - Exploits checkm8 ROM vulnerability (unpatchable)
+  - Loads pongoOS on T2
+  - Patches secure boot verification routine
+  - Writes persistent config to T2 NVRAM
+  - Preserves all T2 hardware functions
+
+What it preserves:
+  ✅ NVMe storage access
+  ✅ Audio routing (DAC)
+  ✅ Keyboard/trackpad (via apple-bce)
+  ✅ FaceTime camera
+  ❌ Secure boot (intentionally disabled)
+  ❌ FileVault encryption (may need reconfiguration)
+```
+
+### Forked Repos (12 Total)
+
+#### OCLP Forks (8)
+| Repo | Purpose |
+|------|---------|
+| OCLP-X | Extended Tahoe support |
+| OCLP-Mod | Modified builds (Intel Wi-Fi) |
+| OCLP-Plus | Tahoe patchset v3.2.2 |
+| OpenCore-Legacy-Allow-Tahoe | Root patches |
+| OCLP-lzhoang2801-amfipassbeta | AMFIPass variant |
+| OCLP-lzhoang2801 | Reference OCLP 3.0.0 nightly |
+| OCLP4Hackintosh | Kaby Lake+ guide |
+| lzhoang2801-OCLP | Original Tahoe patchset |
+
+#### T2 Research Forks (4)
+| Repo | Purpose |
+|------|---------|
+| [apple-bce-drv](https://github.com/DeadByDawn101/apple-bce-drv) | T2 Bridge/Buffer Copy Engine driver |
+| [linux-t2-patches](https://github.com/DeadByDawn101/linux-t2-patches) | Kernel patches for T2 hardware |
+| [T2-Ubuntu](https://github.com/DeadByDawn101/T2-Ubuntu) | Ubuntu ISO for T2 Macs |
+| [bootra1n](https://github.com/DeadByDawn101/bootra1n) | Minimal Linux for running checkra1n |
+
+### Next Steps
+
+- [ ] **This week:** Set up Retina Relay + file server on current macOS
+- [ ] **Level 1 test:** Try "No Security" + external Thunderbolt boot with Tahoe
+- [ ] **Level 1 test:** Block AppleKeyStore.kext in OpenCore config
+- [ ] **Research:** Study pongoOS source code for persistence mechanisms
+- [ ] **Research:** Study apple-bce-drv for T2 communication patterns
+- [ ] **Build:** Create `t2-freedom` tool skeleton in Big-Mouth repo
+- [ ] **Community:** Post findings to t2linux Discord + OCLP GitHub discussions
+
+---
+
+*"We don't give up. We do what others don't and build what isn't possible." — RavenX LLC*
