@@ -195,3 +195,88 @@ TERTIARY:  macOS Tahoe testing / community contribution
 
 *Stand User: RavenX LLC / @DeadByDawn101*
 *"We don't give up. We do what others don't and build what isn't possible."*
+
+---
+
+## Research Findings (June 4, 2026)
+
+### THE T2 REALITY — Honest Assessment
+
+The iMac Pro 2017 has Apple's FIRST-GENERATION T2 chip. This is currently the **#1 unsolved problem** across ALL OCLP forks:
+
+> *"When these Macs try to boot macOS Tahoe through OpenCore, the T2 chip detects the unauthorized bootloader and triggers a kernel panic — a hard crash before the OS even loads."* — ITECH4MAC
+
+> *"The OCLP team has confirmed this on GitHub Issue #1167 and stated that T2 support requires 'extensive time and research' with no estimate given."*
+
+| Mac Type | Tahoe Status | Via |
+|----------|-------------|-----|
+| Non-T2 Intel (2012-2017) | ✅ Working | OCLP-Plus v3.2.2 |
+| T2 Macs (2017-2019) | ❌ Kernel panic | UNSOLVED by any fork |
+| Apple Silicon | ✅ Native | Apple |
+
+**This means our iMac Pro is in the HARDEST category.** But that's exactly why we work on it — nobody else is solving this.
+
+### Forked Repos (8 Total)
+
+| Repo | What It Does |
+|------|-------------|
+| [OCLP-X](https://github.com/DeadByDawn101/OCLP-X) | JeoJay127's extended Tahoe support (uses max_os) |
+| [OCLP-Mod](https://github.com/DeadByDawn101/OCLP-Mod) | laobamac's modified builds (Intel Wi-Fi) |
+| [OCLP-Plus](https://github.com/DeadByDawn101/OCLP-Plus) | YBronst's Tahoe patchset v3.2.2 (Broadcom Wi-Fi, Vega Metal) |
+| [OpenCore-Legacy-Allow-Tahoe](https://github.com/DeadByDawn101/OpenCore-Legacy-Allow-Tahoe) | TAHOEOCLP fork with root patches |
+| [OCLP-lzhoang2801-amfipassbeta](https://github.com/DeadByDawn101/OCLP-lzhoang2801-amfipassbeta) | AMFIPass variant (no amfi=0x80) |
+| [OCLP-lzhoang2801](https://github.com/DeadByDawn101/OCLP-lzhoang2801) | Preserved reference OCLP 3.0.0 nightly |
+| [OCLP4Hackintosh](https://github.com/DeadByDawn101/OCLP4Hackintosh) | 5T33Z0's Kaby Lake+ guide |
+| [lzhoang2801-OCLP](https://github.com/DeadByDawn101/OpenCore-Legacy-Patcher) | Original Tahoe patchset base |
+
+### What's WORKING in OCLP-Plus v3.2.2 (Non-T2 Macs)
+
+- ✅ AMD Vega Metal acceleration (GCN 5 patches)
+- ✅ Broadcom Wi-Fi with AWDL (AirDrop works!)
+- ✅ AppleHDA audio restoration
+- ✅ IOSurface offset patches
+- ✅ Metal bundle patches and shims
+- ✅ AMFIPass.kext with -amfipassbeta boot arg
+- ✅ APFS-only environment handling (macOS 26.4+)
+- ✅ KDK integration for audio drivers
+- ✅ Works on macOS 26.0 through 26.4.1
+
+### What's BROKEN for T2 Macs (Our iMac Pro)
+
+- ❌ T2 secure boot conflicts with OpenCore bootloader
+- ❌ Tahoe's new SIP enforcement causes kernel panic on T2
+- ❌ T2 NVMe storage not visible (our Issue #1)
+- ❌ T2 audio routing (our Issue #4)
+
+### Revised Strategy
+
+Since T2 is the blocker, we have TWO paths:
+
+**Path A: External Boot (Bypass T2 NVMe)**
+1. Install Tahoe to external Thunderbolt 3 SSD
+2. Boot from external, bypassing T2 storage entirely
+3. Apply OCLP-Plus patches for Vega Metal + Wi-Fi
+4. Use as file server + Retina Relay display
+5. Internal SSD stays on Sequoia as fallback
+
+**Path B: T2 Kernel Bypass (Research)**
+1. Investigate T2 secure boot bypass
+2. Study t2linux project (Linux on T2 Macs) for techniques
+3. Potentially disable T2 secure boot via Apple Configurator 2
+4. Custom kernel extension or SSDT to handle T2 NVMe handshake
+5. This is the "nobody has solved it" path
+
+**Recommended: Start with Path A (external boot) for immediate use, research Path B in parallel.**
+
+### Key Technical Notes
+
+- macOS Tahoe = version 26, latest is 26.5 (May 2026)
+- Tahoe is the FINAL Intel macOS — macOS 27 will be Apple Silicon only
+- Apple is already thinning Intel code from frameworks
+- OCLP team is smaller than ever (key contributors left)
+- Community forks (OCLP-Plus, OCLP-Mod, OCLP-X) are where active development happens
+- AMFIPass.kext + `-amfipassbeta` is better than `amfi=0x80` (more app compatibility)
+
+---
+
+*"We don't give up. We do what others don't and build what isn't possible." — RavenX LLC*
